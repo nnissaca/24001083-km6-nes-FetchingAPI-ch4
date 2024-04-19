@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 
 const API_KEY = "52b2a50250de0b7306b76a36c51029e8";
@@ -8,6 +8,7 @@ const API_KEY = "52b2a50250de0b7306b76a36c51029e8";
 export default function DetailMovie() {
   const location = useLocation();
   const [detail, setDetail] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchDetail = async () => {
@@ -26,6 +27,15 @@ export default function DetailMovie() {
     fetchDetail();
   }, []);
 
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      // Jika tidak ada token, arahkan pengguna kembali ke halaman login
+      alert("Silakan login terlebih dahulu.");
+      navigate("/");
+    }
+  }, []);
+
   return (
     <>
       <div className="flex items-center justify-between mt-3 absolute w-screen px-5">
@@ -34,29 +44,6 @@ export default function DetailMovie() {
             <strong>Movielist</strong>
           </Link>
         </p>
-
-        <div className="flex items-center">
-          <ul className="flex justify-center align-center text-white shadow-lg">
-            <Link
-              to="/nowPlaying"
-              className="mx-5 hover:text-red-600 focus:text-red-600"
-            >
-              Now Playing
-            </Link>
-            <Link
-              to="/genre"
-              className="mx-5 hover:text-red-600 focus:text-red-600"
-            >
-              Genre
-            </Link>
-            <Link
-              to="/favMovie"
-              className="mx-5 hover:text-red-600 focus:text-red-600"
-            >
-              Favorite Movie
-            </Link>
-          </ul>
-        </div>
       </div>
       <div className="mx-auto flex justify-center items-center">
         <div

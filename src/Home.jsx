@@ -1,268 +1,54 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Link } from "react-router-dom";
 import "./App.css";
 import { useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
+import AfterLogIn from "./components/AfterLogIn";
+import BeforeLogIn from "./components/BeforeLogIn";
 
 export default function Home() {
-  const API_KEY = "52b2a50250de0b7306b76a36c51029e8";
-  const [popularMovies, setPopularMovies] = useState([]);
-  const [nowPlaying, setNowPlaying] = useState([]);
-  const [movies, setMovies] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [currentMovie, setCurrentMovie] = useState(0);
-  const filteredMovie = popularMovies.slice(0, 4);
-  const [searchResult, setSearchResult] = useState([]);
+  const [loggedIn, setLoggedIn] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
-    const fetchNowPlaying = async () => {
-      try {
-        const response = await axios.get(
-          `https://api.themoviedb.org/3/movie/now_playing?api_key=${API_KEY}`
-        );
+    const token = localStorage.getItem("token");
+    if (token) {
+      setLoggedIn(true);
+    } else {
+      setLoggedIn(false);
+    }
+  }, [location]);
 
-        setNowPlaying(response.data.results);
-        setMovies(response.data.results);
-      } catch (error) {
-        console.error("Error fetching now playing movies:", error);
+  useEffect(() => {
+    const handleNavigation = () => {
+      const path = window.location.pathname;
+      const token = localStorage.getItem("token");
+      if (path === "/home" && !token) {
+        navigate("/");
+        alert("Anda harus login terlebih dahulu.");
+      } else if (path === "/" && token) {
+        alert(
+          "Ingat, Anda masih login, silakan tekan logout untuk kembali ke tampilan non-login."
+        );
+        navigate("/home");
       }
     };
-
-    fetchNowPlaying();
+    handleNavigation();
   }, []);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentMovie((prevMovie) => (prevMovie + 1) % movies.length);
-    }, 3000); // Ganti dengan interval yang diinginkan (dalam milidetik)
-
-    return () => clearInterval(interval);
-  }, [movies]);
-
-  useEffect(() => {
-    const fetchPopularMovies = async () => {
-      try {
-        const response = await axios.get(
-          `https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}`
-        );
-        setPopularMovies(response.data.results);
-      } catch (error) {
-        console.error("Error fetching popular movies:", error);
-      }
-    };
-
-    fetchPopularMovies();
-  }, []);
-
-  useEffect(() => {
-    const fetchSearchMovies = async () => {
-      try {
-        const response = await axios.get(
-          `https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${searchTerm}}`,
-          { header: { accept: "application/json" } }
-        );
-        setSearchResult(response.data.results);
-      } catch (err) {
-        console.log("error fetching data: ", err);
-      }
-    };
-
-    fetchSearchMovies();
-  }, [searchTerm]);
-
-  const handleSearch = (e) => {
-    setSearchTerm(e.target.value);
+  const handleLogout = () => {
+    const confirmLogout = window.confirm("Apakah Anda yakin ingin logout?");
+    if (confirmLogout) {
+      localStorage.removeItem("token");
+      setLoggedIn(false);
+      navigate("/"); // Navigate back to "/" after logout
+    }
   };
 
   return (
     <>
-      <div className="flex items-center justify-between mt-3 absolute w-screen px-5">
-        <p className="flex items-center text-5xl text-red-600">
-          <Link to="/">
-            <strong>Movielist</strong>
-          </Link>
-        </p>
-        <div className="flex items-center border py-2 px-4 rounded-full border-red-600 text-white">
-          <input
-            type="text"
-            placeholder="What do yo want to search?"
-            value={searchTerm}
-            onChange={handleSearch}
-            autoFocus={true}
-            className="bg-transparent w-[300px] outline-none mr-10 px-2"
-          />
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width={24}
-            height={24}
-            viewBox="0 0 24 24"
-          >
-            <path
-              fill="currentColor"
-              d="m19.6 21l-6.3-6.3q-.75.6-1.725.95T9.5 16q-2.725 0-4.612-1.888T3 9.5q0-2.725 1.888-4.612T9.5 3q2.725 0 4.613 1.888T16 9.5q0 1.1-.35 2.075T14.7 13.3l6.3 6.3zM9.5 14q1.875 0 3.188-1.312T14 9.5q0-1.875-1.312-3.187T9.5 5Q7.625 5 6.313 6.313T5 9.5q0 1.875 1.313 3.188T9.5 14"
-            ></path>
-          </svg>
-        </div>
-        <div className="flex items-center">
-          <ul className="flex justify-center align-center text-white">
-            <Link
-              to="/nowPlaying"
-              className="mx-5 hover:text-red-600 focus:text-red-600"
-            >
-              Now Playing
-            </Link>
-            <Link
-              to="/genre"
-              className="mx-5 hover:text-red-600 focus:text-red-600"
-            >
-              Genre
-            </Link>
-            <Link
-              to="/favMovie"
-              className="mx-5 hover:text-red-600 focus:text-red-600"
-            >
-              Favorite Movie
-            </Link>
-          </ul>
-        </div>
-      </div>
-
-      <div className="carousel">
-        {nowPlaying.map((movie, index) => (
-          <div
-            key={index}
-            className={`carousel-slide ${index === currentMovie ? "show" : ""}`}
-            style={{
-              backgroundImage: `url(https://image.tmdb.org/t/p/original${movie.backdrop_path})`,
-            }}
-          >
-            <div className="overlay flex flex-col max-w-sm mb-24 text-white">
-              <h1 className="text-6xl mb-5 text-shadow-black">{movie.title}</h1>
-              <p className="mb-5 text-shadow-black">
-                {movie.overview.slice(0, 100)}...
-              </p>
-              <div className="rounded-full flex items-center px-8 p-3 bg-red-600 mr-44 border-double border">
-                See in Now Playing
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <div
-        className="font-poppins"
-        style={{ fontFamily: "'Poppins', sans-serif" }}
-      >
-        <div className="mx-auto p-4">
-          <h1 className="text-3xl flex items-center font-bold mt-7 mb-4">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width={48}
-              height={48}
-              viewBox="0 0 24 24"
-            >
-              <path
-                fill="none"
-                stroke="#ff0000"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 19V5"
-              ></path>
-            </svg>
-            <span className="text-white">POPULAR MOVIES</span>
-          </h1>
-          <Link to="/popularMovie">
-            <div className="flex text-red-600 justify-end mb-4">
-              <span className="mr-1">See All Movie</span>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width={24}
-                height={24}
-                viewBox="0 0 24 24"
-              >
-                <path
-                  fill="currentColor"
-                  d="M4 11v2h12l-5.5 5.5l1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5L16 11z"
-                ></path>
-              </svg>
-            </div>
-          </Link>
-          <div className="grid grid-cols-4 gap-3 mb-8 m-2">
-            {filteredMovie?.map((movie) => (
-              <div
-                key={movie.id}
-                className="mt-2 rounded-lg flex flex-col max-w[350px] max-sm:min-w-[250px] items-center shadow-[0_0_2px_1px_rgb(0,0,0,0.3)] hover:shadow-xl hover:shadow-red-600 hover:scale-105"
-                style={{ height: "100%" }}
-              >
-                <div
-                  className="bg-cover min-h-[410px] w-full rounded-md flex flex-col items-center justify-center relative"
-                  onClick={() => {
-                    navigate("/detailMovie", { state: { id: movie.id } });
-                  }}
-                >
-                  <h2 className="font-bold flex absolute left-0 top-4 bg-white p-2 rounded-e-md">
-                    ⭐
-                    <div className="ml-1">{movie?.vote_average.toFixed(1)}</div>
-                  </h2>
-                  <img
-                    className="absolute -z-10 max-h-[420px] object-cover w-full top-0 left-0 filter blur-[4px]"
-                    src={`https://image.tmdb.org/t/p/w500/${movie.poster_path}`}
-                    alt=""
-                  />
-                  <img
-                    src={`https://image.tmdb.org/t/p/w500/${movie.poster_path}`}
-                    alt={movie.title}
-                    className="max-w-56 rounded-sm"
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-          <h1 className="text-2xl font-bold mb-10 text-center mt-16 text-white">
-            Search Result {searchTerm}
-          </h1>
-          {searchResult.length > 0 ? (
-            <div className="grid grid-cols-4 gap-3 mb-8 m-2">
-              {searchResult.map((movie) => (
-                <>
-                  <div
-                    className="mt-2 rounded-lg flex flex-col max-w[350px] max-sm:min-w-[250px] items-center shadow-[0_0_2px_1px_rgb(0,0,0,0.3)] hover:shadow-xl hover:shadow-red-600 hover:scale-105"
-                    style={{ height: "100%" }}
-                  >
-                    <div
-                      className="bg-cover min-h-[410px] w-full rounded-md flex flex-col items-center justify-center relative"
-                      onClick={() => {
-                        navigate("/detailMovie", { state: { id: movie.id } });
-                      }}
-                    >
-                      <h2 className="font-bold flex absolute left-0 top-4 bg-white p-2 rounded-e-md">
-                        ⭐
-                        <div className="ml-1">
-                          {movie?.vote_average.toFixed(1)}
-                        </div>
-                      </h2>
-                      <img
-                        className="absolute -z-10 max-h-[420px] object-cover w-full top-0 left-0 filter blur-[4px]"
-                        src={`https://image.tmdb.org/t/p/w500/${movie.poster_path}`}
-                        alt=""
-                      />
-                      <img
-                        src={`https://image.tmdb.org/t/p/w500/${movie.poster_path}`}
-                        alt={movie.title}
-                        className="max-w-56 rounded-sm"
-                      />
-                    </div>
-                  </div>
-                </>
-              ))}
-            </div>
-          ) : (
-            <p className="text-center text-white mb-6">None</p>
-          )}
-        </div>
-      </div>
+      {loggedIn ? <AfterLogIn handleLogout={handleLogout} /> : <BeforeLogIn />}
     </>
   );
 }

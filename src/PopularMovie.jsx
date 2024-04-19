@@ -34,33 +34,10 @@ export default function PopularMovie() {
               <strong>Movielist</strong>
             </Link>
           </p>
-
-          <div className="flex items-center">
-            <ul className="flex justify-center align-center text-white">
-              <Link
-                to="/nowPlaying"
-                className="mx-5 hover:text-red-600 focus:text-red-600"
-              >
-                Now Playing
-              </Link>
-              <Link
-                to="/genre"
-                className="mx-5 hover:text-red-600 focus:text-red-600"
-              >
-                Genre
-              </Link>
-              <Link
-                to="/favMovie"
-                className="mx-5 hover:text-red-600 focus:text-red-600"
-              >
-                Favorite Movie
-              </Link>
-            </ul>
-          </div>
         </div>
       </div>
       <h1 className="text-center my-3 font-bold text-white text-2xl">
-        Favorite Movie
+        Popular Movie
       </h1>
       <div className="grid grid-cols-4 gap-3 mb-8 m-2 mx-auto p-6">
         {movies.map((movie) => (

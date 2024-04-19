@@ -87,28 +87,6 @@ const FavoriteMovie = () => {
             ></path>
           </svg>
         </div>
-        <div className="flex items-center">
-          <ul className="flex justify-center align-center text-white">
-            <Link
-              to="/nowPlaying"
-              className="mx-5 hover:text-red-600 focus:text-red-600"
-            >
-              Now Playing
-            </Link>
-            <Link
-              to="/genre"
-              className="mx-5 hover:text-red-600 focus:text-red-600"
-            >
-              Genre
-            </Link>
-            <Link
-              to="/favMovie"
-              className="mx-5 hover:text-red-600 focus:text-red-600"
-            >
-              Favorite Movie
-            </Link>
-          </ul>
-        </div>
       </div>
 
       <div>

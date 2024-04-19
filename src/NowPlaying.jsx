@@ -34,29 +34,6 @@ export default function nowPlaying() {
               <strong>Movielist</strong>
             </Link>
           </p>
-
-          <div className="flex items-center">
-            <ul className="flex justify-center align-center text-white">
-              <Link
-                to="/nowPlaying"
-                className="mx-5 hover:text-red-600 focus:text-red-600"
-              >
-                Now Playing
-              </Link>
-              <Link
-                to="/genre"
-                className="mx-5 hover:text-red-600 focus:text-red-600"
-              >
-                Genre
-              </Link>
-              <Link
-                to="/favMovie"
-                className="mx-5 hover:text-red-600 focus:text-red-600"
-              >
-                Favorite Movie
-              </Link>
-            </ul>
-          </div>
         </div>
       </div>
       <h1 className="text-center my-3 font-bold text-white text-3xl">

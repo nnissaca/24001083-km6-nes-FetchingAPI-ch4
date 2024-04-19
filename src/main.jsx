@@ -8,10 +8,16 @@ import FavoriteMovie from "./FavoriteMovie";
 import DetailMovie from "./DetailMovie";
 import PopularMovie from "./PopularMovie";
 import NowPlaying from "./NowPlaying";
+import Auth from "./Auth";
+import Reg from "./Reg";
 
 const router = createBrowserRouter([
   {
     path: "/",
+    element: <Home />,
+  },
+  {
+    path: "/home",
     element: <Home />,
   },
   {
@@ -33,6 +39,14 @@ const router = createBrowserRouter([
   {
     path: "/nowPlaying",
     element: <NowPlaying />,
+  },
+  {
+    path: "/login",
+    element: <Auth />,
+  },
+  {
+    path: "/register",
+    element: <Reg />,
   },
 ]);
 
